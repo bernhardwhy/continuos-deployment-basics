@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import './App.css';
 import { firebaseDB } from './shared/config';
+import { GroceryType } from './groceryType';
 
 export default class App extends Component {
   state = {
@@ -9,15 +10,15 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-    
+
     const database = firebaseDB.database().ref().child('groceries');
     database.on('value', snap => {
       console.log(snap.val());
-      this.setState({groceries: snap.val()})
+      this.setState({ groceries: snap.val() })
     })
   }
 
-  changeData = (groceryId, isBuyed) => {
+  changeData = (groceryId: string, isBuyed: boolean) => {
     firebaseDB.database().ref().child('groceries/' + groceryId).update({
       buyed: !isBuyed
     });
@@ -30,13 +31,13 @@ export default class App extends Component {
     });
   }
 
-  enterName = (event) => {
-this.setState({
-  name: event.target.value
-})
+  enterName = (event: React.FormEvent<HTMLInputElement>) => {
+    this.setState({
+      name: event.currentTarget.value
+    })
   }
 
-  loopThroughObject = (object) => {
+  loopThroughObject = (object: any) => {
     for (var key in object) {
       // skip loop if the property is from prototype
       if (!object.hasOwnProperty(key)) continue;
@@ -46,7 +47,7 @@ this.setState({
         // skip loop if the property is from prototype
         obj.id = key;
         if (!obj.hasOwnProperty(prop)) continue;
-        
+
       }
     }
   }
@@ -56,20 +57,20 @@ this.setState({
     this.loopThroughObject(this.state.groceries);
     return (
       <div className="App">
-          {renderedGroceries.map(grocery => {
-            return (
+        {renderedGroceries.map(grocery => {
+          return (
             <div>
               <div>
                 <div>
-                  <h1>{grocery.name}</h1>                
-                    <p>{grocery.buyed ? 'bought' : 'to buy'}</p>
-                    <button onClick={() => this.changeData(grocery.id, grocery.buyed)}>update entry</button>
+                  <h1>{grocery.name}</h1>
+                  <p>{grocery.buyed ? 'bought' : 'to buy'}</p>
+                  <button onClick={() => this.changeData(grocery.id, grocery.buyed)}>update entry</button>
                 </div>
               </div>
             </div>
-            )
-          })}
-          <input type="text" onChange={this.enterName} value={this.state.name} placeholder="enter lebensmittel"/>
+          )
+        })}
+        <input type="text" onChange={this.enterName} value={this.state.name} placeholder="enter lebensmittel" />
         <button disabled={!this.state.name} onClick={this.addData}>add brot</button>
       </div>
     )
