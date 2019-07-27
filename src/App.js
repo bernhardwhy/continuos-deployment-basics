@@ -1,26 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react'
 import './App.css';
+import { DB_CONFIG } from './shared/config';
+import firebase from 'firebase';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+export default class App extends Component {
+  state = {
+    groceries: 5,
+  }
+
+  componentDidMount() {
+    const app = firebase.initializeApp(DB_CONFIG);
+    const database = app.database().ref().child('groceries');
+    database.on('value', snap => {
+      this.setState({
+        groceries: snap.val()
+      })
+    })
+  }
+
+  render() {
+    return (
+      <div className="App">
         <p>
-          v 1.1
+          {this.state.groceries}
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+      </div>
+    )
+  }
 }
-
-export default App;
