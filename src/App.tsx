@@ -59,19 +59,18 @@ export default class App extends Component {
       <div className="App">
         {renderedGroceries.map(grocery => {
           return (
-            <div>
-              <div>
+            <div key={ grocery.id }>
+              {!grocery.buyed &&
                 <div>
                   <h1>{grocery.name}</h1>
-                  <p>{grocery.buyed ? 'bought' : 'to buy'}</p>
-                  <button onClick={() => this.changeData(grocery.id, grocery.buyed)}>update entry</button>
+                  <button onClick={() => this.changeData(grocery.id, grocery.buyed)}>gekauft</button>
                 </div>
-              </div>
+              }
             </div>
           )
         })}
         <input type="text" onChange={this.enterName} value={this.state.name} placeholder="enter lebensmittel" />
-        <button disabled={!this.state.name} onClick={this.addData}>add brot</button>
+        <button disabled={!this.state.name} onClick={this.addData}>Hinzufügen</button>
       </div>
     )
   }
