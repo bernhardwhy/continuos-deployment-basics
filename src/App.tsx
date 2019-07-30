@@ -53,7 +53,7 @@ export default class App extends Component {
   }
 
   render() {
-    const renderedGroceries = Object.values(this.state.groceries);
+    const renderedGroceries: GroceryType[] = Object.values(this.state.groceries);
     this.loopThroughObject(this.state.groceries);
     return (
       <div className="App">
