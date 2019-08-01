@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
+import firebase from "firebase";
 
 ReactDOM.render(<App />, document.getElementById("root"));
 
@@ -10,3 +11,19 @@ ReactDOM.render(<App />, document.getElementById("root"));
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.register();
+
+const messaging = firebase.messaging();
+navigator.serviceWorker.ready.then(registeredSW => {
+  messaging.useServiceWorker(registeredSW);
+});
+messaging
+  .requestPermission()
+  .then(() => {
+    console.log("have permission");
+    messaging.getToken().then(token => {
+      console.log("got notification token", token);
+    });
+  })
+  .catch(error => {
+    console.log("ERROR: permission denied", error);
+  });

@@ -11,19 +11,3 @@ const DB_CONFIG = {
 };
 
 export const firebaseDB = firebase.initializeApp(DB_CONFIG);
-
-const messaging = firebase.messaging();
-navigator.serviceWorker.ready.then(registeredSW => {
-  messaging.useServiceWorker(registeredSW);
-});
-messaging
-  .requestPermission()
-  .then(() => {
-    console.log("have permission");
-    messaging.getToken().then(token => {
-      console.log("got notification token", token);
-    });
-  })
-  .catch(error => {
-    console.log("ERROR: permission denied", error);
-  });
