@@ -57,6 +57,7 @@ export default class App extends Component {
     this.loopThroughObject(this.state.groceries);
     return (
       <div className="App">
+        <h1>Groceries: v1.1</h1>
         {renderedGroceries.map(grocery => {
           return (
             <div key={ grocery.id }>
