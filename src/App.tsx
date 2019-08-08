@@ -1,41 +1,69 @@
-import React, { Component } from 'react'
-import './App.css';
-import { firebaseDB } from './shared/config';
-import { GroceryType } from './groceryType';
+import React, { Component } from "react";
+import "./App.css";
+import { firebaseDB } from "./shared/config";
+import { GroceryType } from "./groceryType";
+
+import BottomNavigation from "@material-ui/core/BottomNavigation";
+import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
+import RestoreIcon from "@material-ui/icons/Restore";
+import AddCircleOutlineSharp from "@material-ui/icons/AddCircleOutlineSharp";
+import {
+  Card,
+  CardContent,
+  Typography,
+  CardActions,
+  Button
+} from "@material-ui/core";
 
 export default class App extends Component {
   state = {
     groceries: {},
-    name: '',
-  }
+    searchInput: "",
+    activeTab: 0
+  };
 
   componentDidMount() {
-
-    const database = firebaseDB.database().ref().child('groceries');
-    database.on('value', snap => {
+    const database = firebaseDB
+      .database()
+      .ref()
+      .child("groceries");
+    database.on("value", snap => {
       console.log(snap.val());
-      this.setState({ groceries: snap.val() })
-    })
+      this.setState({ groceries: snap.val() });
+    });
   }
 
   changeData = (groceryId: string, isBuyed: boolean) => {
-    firebaseDB.database().ref().child('groceries/' + groceryId).update({
-      buyed: !isBuyed
-    });
-  }
+    navigator.vibrate([200, 500, 200]);
+    firebaseDB
+      .database()
+      .ref()
+      .child("groceries/" + groceryId)
+      .update({
+        buyed: !isBuyed
+      });
+  };
 
   addData = () => {
-    firebaseDB.database().ref().child('groceries/').push({
-      name: this.state.name,
-      buyed: false
-    });
-  }
-
-  enterName = (event: React.FormEvent<HTMLInputElement>) => {
+    firebaseDB
+      .database()
+      .ref()
+      .child("groceries/")
+      .push({
+        name: this.state.searchInput,
+        buyed: false
+      });
     this.setState({
-      name: event.currentTarget.value
-    })
-  }
+      searchInput: ""
+    });
+  };
+
+  enterSearchInput = (event: React.FormEvent<HTMLInputElement>) => {
+    navigator.vibrate([200, 500, 200]);
+    this.setState({
+      searchInput: event.currentTarget.value
+    });
+  };
 
   loopThroughObject = (object: any) => {
     for (var key in object) {
@@ -47,32 +75,101 @@ export default class App extends Component {
         // skip loop if the property is from prototype
         obj.id = key;
         if (!obj.hasOwnProperty(prop)) continue;
-
       }
     }
-  }
+  };
 
   render() {
-    const renderedGroceries: GroceryType[] = Object.values(this.state.groceries);
+    const renderedGroceries: GroceryType[] = Object.values(
+      this.state.groceries
+    );
     this.loopThroughObject(this.state.groceries);
     return (
       <div className="App">
-        <h1>Groceries: v1.1</h1>
-        {renderedGroceries.map(grocery => {
-          return (
-            <div key={ grocery.id }>
-              {!grocery.buyed &&
-                <div>
-                  <h1>{grocery.name}</h1>
-                  <button onClick={() => this.changeData(grocery.id, grocery.buyed)}>gekauft</button>
-                </div>
-              }
-            </div>
-          )
-        })}
-        <input type="text" onChange={this.enterName} value={this.state.name} placeholder="enter lebensmittel" />
-        <button disabled={!this.state.name} onClick={this.addData}>Hinzufügen</button>
+        Groceries: v1.2
+        <div className="GroceryList">
+          {renderedGroceries.map(grocery => {
+            return (
+              <div key={grocery.id}>
+                {this.state.activeTab === 0
+                  ? !grocery.buyed && (
+                      <Card className="Card">
+                        <CardContent>
+                          <Typography variant="h5" component="h2">
+                            {grocery.name}
+                          </Typography>
+                          <Typography className="Pos" color="textSecondary">
+                            adjective
+                          </Typography>
+                        </CardContent>
+                        <CardActions>
+                          <Button
+                            onClick={() =>
+                              this.changeData(grocery.id, grocery.buyed)
+                            }
+                            size="small"
+                          >
+                            gekauft
+                          </Button>
+                        </CardActions>
+                      </Card>
+                    )
+                  : grocery.buyed && (
+                      <Card className="Card">
+                        <CardContent>
+                          <Typography variant="h5" component="h2">
+                            {grocery.name}
+                          </Typography>
+                          <Typography className="Pos" color="textSecondary">
+                            adjective
+                          </Typography>
+                        </CardContent>
+                        <CardActions>
+                          <Button
+                            onClick={() =>
+                              this.changeData(grocery.id, grocery.buyed)
+                            }
+                            size="small"
+                          >
+                            auf die einkaufsliste
+                          </Button>
+                        </CardActions>
+                      </Card>
+                    )}
+              </div>
+            );
+          })}
+        </div>
+        {this.state.activeTab === 1 && (
+          <div className="InputWrapper">
+            <input
+              type="text"
+              onChange={this.enterSearchInput}
+              value={this.state.searchInput}
+              placeholder="enter lebensmittel"
+            />
+            <button disabled={!this.state.searchInput} onClick={this.addData}>
+              Hinzufügen
+            </button>
+          </div>
+        )}
+        <BottomNavigation
+          className="BottomNavigation"
+          value={this.state.activeTab}
+          onChange={(event, newValue) => {
+            this.setState({
+              activeTab: newValue
+            });
+          }}
+          showLabels
+        >
+          <BottomNavigationAction
+            label="New"
+            icon={<AddCircleOutlineSharp />}
+          />
+          <BottomNavigationAction label="Recents" icon={<RestoreIcon />} />
+        </BottomNavigation>
       </div>
-    )
+    );
   }
 }
