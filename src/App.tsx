@@ -62,11 +62,6 @@ export default class App extends Component {
   };
 
   enterSearchInput = (event: React.FormEvent<HTMLInputElement>) => {
-    if ("vibrate" in navigator) {
-      // vibration API supported
-      navigator.vibrate([200, 500, 200]);
-    }
-
     this.setState({
       searchInput: event.currentTarget.value
     });
