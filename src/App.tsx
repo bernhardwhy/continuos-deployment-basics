@@ -34,7 +34,10 @@ export default class App extends Component {
   }
 
   changeData = (groceryId: string, isBuyed: boolean) => {
-    navigator.vibrate([200, 500, 200]);
+    if ("vibrate" in navigator) {
+      // vibration API supported
+      navigator.vibrate([200, 500, 200]);
+    }
     firebaseDB
       .database()
       .ref()
@@ -86,7 +89,7 @@ export default class App extends Component {
     this.loopThroughObject(this.state.groceries);
     return (
       <div className="App">
-        Groceries: v1.6
+        Groceries: v1.6.1
         <div className="GroceryList">
           {renderedGroceries.map(grocery => {
             return (
