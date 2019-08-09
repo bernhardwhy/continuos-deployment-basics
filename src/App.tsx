@@ -86,7 +86,7 @@ export default class App extends Component {
     this.loopThroughObject(this.state.groceries);
     return (
       <div className="App">
-        Groceries: v1.2
+        Groceries: v1.3
         <div className="GroceryList">
           {renderedGroceries.map(grocery => {
             return (
