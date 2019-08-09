@@ -23,6 +23,8 @@ export default class App extends Component {
   };
 
   componentDidMount() {
+    console.log(window.newUpdateAvailable);
+
     const database = firebaseDB
       .database()
       .ref()
@@ -86,7 +88,7 @@ export default class App extends Component {
     this.loopThroughObject(this.state.groceries);
     return (
       <div className="App">
-        Groceries: v1.4
+        Groceries: v1.5
         <div className="GroceryList">
           {renderedGroceries.map(grocery => {
             return (

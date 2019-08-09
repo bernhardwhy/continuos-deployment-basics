@@ -76,7 +76,7 @@ function registerValidSW(swUrl, config) {
 
                 let r = window.confirm("Press a button!");
                 if (r === true) {
-                  window.location.reload();
+                  window.newUpdateAvailable = true;
                 }
 
               // Execute callback

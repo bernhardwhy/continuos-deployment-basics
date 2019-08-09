@@ -10,3 +10,10 @@ ReactDOM.render(<App />, document.getElementById("root"));
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.register();
+declare global {
+  interface Window {
+    newUpdateAvailable: any;
+  }
+}
+
+window.newUpdateAvailable = false;
