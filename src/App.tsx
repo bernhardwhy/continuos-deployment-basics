@@ -62,7 +62,11 @@ export default class App extends Component {
   };
 
   enterSearchInput = (event: React.FormEvent<HTMLInputElement>) => {
-    navigator.vibrate([200, 500, 200]);
+    if ("vibrate" in navigator) {
+      // vibration API supported
+      navigator.vibrate([200, 500, 200]);
+    }
+
     this.setState({
       searchInput: event.currentTarget.value
     });
@@ -89,7 +93,7 @@ export default class App extends Component {
     this.loopThroughObject(this.state.groceries);
     return (
       <div className="App">
-        Groceries: v1.6.1
+        Groceries: v1.6.2
         <div className="GroceryList">
           {renderedGroceries.map(grocery => {
             return (
