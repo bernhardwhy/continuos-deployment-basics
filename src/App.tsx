@@ -9,10 +9,12 @@ import RestoreIcon from "@material-ui/icons/Restore";
 import AddCircleOutlineSharp from "@material-ui/icons/AddCircleOutlineSharp";
 import { Button } from "@material-ui/core";
 import GroceryList from "./GroceryList/GroceryList";
+import { object } from "prop-types";
 
 export default class App extends Component {
   state = {
-    groceries: {},
+    groceries: [],
+    filteredGroceries: undefined,
     searchInput: "",
     activeTab: 0,
     loading: false,
@@ -32,8 +34,10 @@ export default class App extends Component {
     database.on(
       "value",
       snap => {
-        console.log(snap.val());
-        this.setState({ groceries: snap.val(), loading: false });
+        const dataToManipulate = snap.val();
+        this.loopThroughObject(dataToManipulate);
+        const manipulatedData: GroceryType[] = Object.values(dataToManipulate);
+        this.setState({ groceries: manipulatedData, loading: false });
       },
       () => {
         this.setState({ loading: false, errorLoadingData: true });
@@ -70,7 +74,20 @@ export default class App extends Component {
   };
 
   enterSearchInput = (event: React.FormEvent<HTMLInputElement>) => {
+    let updatedList = [...this.state.groceries];
+    if (event.currentTarget.value.length > 0) {
+      updatedList = updatedList.filter(function(item: GroceryType) {
+        return (
+          item.name
+            .toLowerCase()
+            .search(event.currentTarget.value.toLowerCase()) !== -1
+        );
+      });
+    }
+
     this.setState({
+      filteredGroceries:
+        event.currentTarget.value.length > 0 ? updatedList : undefined,
       searchInput: event.currentTarget.value
     });
   };
@@ -79,7 +96,6 @@ export default class App extends Component {
     for (var key in object) {
       // skip loop if the property is from prototype
       if (!object.hasOwnProperty(key)) continue;
-
       var obj = object[key];
       for (var prop in obj) {
         // skip loop if the property is from prototype
@@ -90,10 +106,6 @@ export default class App extends Component {
   };
 
   render() {
-    const renderedGroceries: GroceryType[] = Object.values(
-      this.state.groceries
-    );
-    this.loopThroughObject(this.state.groceries);
     const activeGroceryState = this.state.activeTab === 0;
 
     return (
@@ -108,7 +120,7 @@ export default class App extends Component {
           </div>
         ) : (
           <GroceryList
-            groceries={renderedGroceries}
+            groceries={this.state.filteredGroceries || this.state.groceries}
             activeGroceryState={activeGroceryState}
             changeData={this.changeData}
           />
