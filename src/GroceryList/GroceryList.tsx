@@ -16,14 +16,6 @@ type GroceryProps = {
 };
 
 export default class GroceryList extends Component<GroceryProps> {
-  componentDidMount() {
-    console.log("Props", this.props);
-  }
-
-  componentWillReceiveProps(nextProps: {}) {
-    console.log(nextProps);
-  }
-
   render() {
     return (
       <div className="GroceryList">
