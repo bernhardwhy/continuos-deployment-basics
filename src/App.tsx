@@ -7,31 +7,39 @@ import BottomNavigation from "@material-ui/core/BottomNavigation";
 import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
 import RestoreIcon from "@material-ui/icons/Restore";
 import AddCircleOutlineSharp from "@material-ui/icons/AddCircleOutlineSharp";
-import {
-  Card,
-  CardContent,
-  Typography,
-  CardActions,
-  Button
-} from "@material-ui/core";
+import { Button } from "@material-ui/core";
+import GroceryList from "./GroceryList/GroceryList";
 
 export default class App extends Component {
   state = {
     groceries: {},
     searchInput: "",
-    activeTab: 0
+    activeTab: 0,
+    loading: false,
+    errorLoadingData: false
   };
 
   componentDidMount() {
+    this.fetchData();
+  }
+
+  fetchData = () => {
+    this.setState({ loading: true });
     const database = firebaseDB
       .database()
       .ref()
       .child("groceries");
-    database.on("value", snap => {
-      console.log(snap.val());
-      this.setState({ groceries: snap.val() });
-    });
-  }
+    database.on(
+      "value",
+      snap => {
+        console.log(snap.val());
+        this.setState({ groceries: snap.val(), loading: false });
+      },
+      () => {
+        this.setState({ loading: false, errorLoadingData: true });
+      }
+    );
+  };
 
   changeData = (groceryId: string, isBuyed: boolean) => {
     if ("vibrate" in navigator) {
@@ -86,75 +94,36 @@ export default class App extends Component {
       this.state.groceries
     );
     this.loopThroughObject(this.state.groceries);
+    const activeGroceryState = this.state.activeTab === 0;
+
     return (
       <div className="App">
-        Groceries: v1.6.2
-        <div className="GroceryList">
-          {renderedGroceries.map(grocery => {
-            return (
-              <div key={grocery.id}>
-                {this.state.activeTab === 0
-                  ? !grocery.buyed && (
-                      <Card className="Card">
-                        <CardContent>
-                          <Typography variant="h5" component="h2">
-                            {grocery.name}
-                          </Typography>
-                          <Typography className="Pos" color="textSecondary">
-                            adjective
-                          </Typography>
-                        </CardContent>
-                        <CardActions>
-                          <Button
-                            onClick={() =>
-                              this.changeData(grocery.id, grocery.buyed)
-                            }
-                            size="small"
-                          >
-                            gekauft
-                          </Button>
-                        </CardActions>
-                      </Card>
-                    )
-                  : grocery.buyed && (
-                      <Card className="Card">
-                        <CardContent>
-                          <Typography variant="h5" component="h2">
-                            {grocery.name}
-                          </Typography>
-                          <Typography className="Pos" color="textSecondary">
-                            adjective
-                          </Typography>
-                        </CardContent>
-                        <CardActions>
-                          <Button
-                            onClick={() =>
-                              this.changeData(grocery.id, grocery.buyed)
-                            }
-                            size="small"
-                          >
-                            auf die einkaufsliste
-                          </Button>
-                        </CardActions>
-                      </Card>
-                    )}
-              </div>
-            );
-          })}
-        </div>
-        {this.state.activeTab === 1 && (
-          <div className="InputWrapper">
-            <input
-              type="text"
-              onChange={this.enterSearchInput}
-              value={this.state.searchInput}
-              placeholder="enter lebensmittel"
-            />
-            <button disabled={!this.state.searchInput} onClick={this.addData}>
-              Hinzufügen
-            </button>
+        Groceries: v1.6.3
+        {this.state.errorLoadingData ? (
+          <div>
+            <p>error fetching data...</p>
+            <Button onClick={this.fetchData} size="small">
+              retry
+            </Button>
           </div>
+        ) : (
+          <GroceryList
+            groceries={renderedGroceries}
+            activeGroceryState={activeGroceryState}
+            changeData={this.changeData}
+          />
         )}
+        <div className="InputWrapper">
+          <input
+            type="text"
+            onChange={this.enterSearchInput}
+            value={this.state.searchInput}
+            placeholder="enter lebensmittel"
+          />
+          <button disabled={!this.state.searchInput} onClick={this.addData}>
+            Hinzufügen
+          </button>
+        </div>
         <BottomNavigation
           className="BottomNavigation"
           value={this.state.activeTab}
@@ -166,7 +135,7 @@ export default class App extends Component {
           showLabels
         >
           <BottomNavigationAction
-            label="New"
+            label="Active"
             icon={<AddCircleOutlineSharp />}
           />
           <BottomNavigationAction label="Recents" icon={<RestoreIcon />} />
