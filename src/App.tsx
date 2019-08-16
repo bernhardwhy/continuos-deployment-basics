@@ -3,13 +3,10 @@ import "./App.css";
 import { firebaseDB } from "./shared/config";
 import { GroceryType } from "./groceryType";
 
-import BottomNavigation from "@material-ui/core/BottomNavigation";
-import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
-import RestoreIcon from "@material-ui/icons/Restore";
-import AddCircleOutlineSharp from "@material-ui/icons/AddCircleOutlineSharp";
-import { Button } from "@material-ui/core";
+import { Button, Fab, Zoom } from "@material-ui/core";
 import GroceryList from "./GroceryList/GroceryList";
-import { object } from "prop-types";
+import SearchDialog from "./SearchDialog/SearchDialog";
+import AddCircleOutlineSharp from "@material-ui/icons/AddCircleOutlineSharp";
 
 export default class App extends Component {
   state = {
@@ -18,7 +15,8 @@ export default class App extends Component {
     searchInput: "",
     activeTab: 0,
     loading: false,
-    errorLoadingData: false
+    errorLoadingData: false,
+    dialogOpen: false
   };
 
   componentDidMount() {
@@ -105,12 +103,20 @@ export default class App extends Component {
     }
   };
 
+  handleDialogClose = () => {
+    this.setState({ dialogOpen: false });
+  };
+
+  handleDialogOpen = () => {
+    this.setState({ dialogOpen: true });
+  };
+
   render() {
     const activeGroceryState = this.state.activeTab === 0;
 
     return (
       <div className="App">
-        Groceries: v1.6.3
+        Groceries: v1.7.0
         {this.state.errorLoadingData ? (
           <div>
             <p>error fetching data...</p>
@@ -136,22 +142,32 @@ export default class App extends Component {
             Hinzufügen
           </button>
         </div>
-        <BottomNavigation
-          className="BottomNavigation"
-          value={this.state.activeTab}
-          onChange={(event, newValue) => {
-            this.setState({
-              activeTab: newValue
-            });
-          }}
-          showLabels
-        >
-          <BottomNavigationAction
-            label="Active"
-            icon={<AddCircleOutlineSharp />}
-          />
-          <BottomNavigationAction label="Recents" icon={<RestoreIcon />} />
-        </BottomNavigation>
+        <SearchDialog
+          handleListItemClicked={this.changeData}
+          groceries={this.state.filteredGroceries || this.state.groceries}
+          openDialog={this.state.dialogOpen}
+          onCloseDialog={this.handleDialogClose}
+        />
+        <div className="BottomNavigation">
+          <Zoom
+            in={!this.state.loading}
+            style={{
+              transitionDelay: `500ms`
+            }}
+            unmountOnExit
+          >
+            <Fab
+              variant="extended"
+              size="large"
+              color="primary"
+              aria-label="add"
+              onClick={this.handleDialogOpen}
+            >
+              <AddCircleOutlineSharp />
+              Hinzufügen
+            </Fab>
+          </Zoom>
+        </div>
       </div>
     );
   }
