@@ -126,7 +126,7 @@ export default class App extends Component {
           </div>
         ) : (
           <GroceryList
-            groceries={this.state.filteredGroceries || this.state.groceries}
+            groceries={this.state.groceries}
             activeGroceryState={activeGroceryState}
             changeData={this.changeData}
           />
