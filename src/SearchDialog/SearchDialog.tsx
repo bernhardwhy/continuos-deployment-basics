@@ -25,7 +25,10 @@ type SearchDialogProps = {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     appBar: {
-      position: "relative"
+      position: "fixed"
+    },
+    listWrapper: {
+      marginTop: "56px"
     },
     title: {
       marginLeft: theme.spacing(2),
@@ -71,15 +74,12 @@ export default function SearchDialog(props: SearchDialogProps) {
             >
               <CloseIcon />
             </IconButton>
-            <Typography variant="h6" className={classes.title}>
-              Sound
+            <Typography variant="subtitle2" className={classes.title}>
+              Zuletzt Hinzugefügt
             </Typography>
-            <Button color="inherit" onClick={handleClose}>
-              save
-            </Button>
           </Toolbar>
         </AppBar>
-        <List>
+        <List className={classes.listWrapper}>
           {props.groceries.map(item => {
             if (item.buyed) {
               return (

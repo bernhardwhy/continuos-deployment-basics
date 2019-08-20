@@ -116,7 +116,7 @@ export default class App extends Component {
 
     return (
       <div className="App">
-        Groceries: v1.7.1
+        Groceries: v1.7.2
         {this.state.errorLoadingData ? (
           <div>
             <p>error fetching data...</p>
