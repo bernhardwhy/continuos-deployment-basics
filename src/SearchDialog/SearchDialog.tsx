@@ -14,6 +14,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import Slide from "@material-ui/core/Slide";
 import { TransitionProps } from "@material-ui/core/transitions";
 import { GroceryType } from "../groceryType";
+import { TextField } from "@material-ui/core";
 
 type SearchDialogProps = {
   openDialog: boolean;
@@ -33,6 +34,19 @@ const useStyles = makeStyles((theme: Theme) =>
     title: {
       marginLeft: theme.spacing(2),
       flex: 1
+    },
+    inputWrapper: {
+      position: "fixed",
+      bottom: "15px",
+      display: "flex",
+      justifyContent: "center",
+      width: "100%"
+    },
+    textField: {
+      background: "white",
+      [`& fieldset`]: {
+        borderRadius: 100
+      }
     }
   })
 );
@@ -101,6 +115,17 @@ export default function SearchDialog(props: SearchDialogProps) {
             }
           })}
         </List>
+        <div className={classes.inputWrapper}>
+          <TextField
+            id="outlined-bare"
+            className={classes.textField}
+            label="Suchen"
+            placeholder="Lebensmittel"
+            margin="normal"
+            variant="outlined"
+            inputProps={{ "aria-label": "bare" }}
+          />
+        </div>
       </Dialog>
     </div>
   );
