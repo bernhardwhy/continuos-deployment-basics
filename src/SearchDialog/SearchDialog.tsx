@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItem from "@material-ui/core/ListItem";
@@ -70,6 +69,11 @@ export default function SearchDialog(props: SearchDialogProps) {
     props.onCloseDialog();
   }
 
+  const enterSearchInput = (event: React.ChangeEvent<HTMLInputElement> ) => {
+    console.log(event.currentTarget.value);
+    
+  };
+
   return (
     <div>
       <Dialog
@@ -120,6 +124,7 @@ export default function SearchDialog(props: SearchDialogProps) {
             id="outlined-bare"
             className={classes.textField}
             label="Suchen"
+            onChange={enterSearchInput}
             placeholder="Lebensmittel"
             margin="normal"
             variant="outlined"
