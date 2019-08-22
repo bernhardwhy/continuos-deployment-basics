@@ -11,8 +11,6 @@ import AddCircleOutlineSharp from "@material-ui/icons/AddCircleOutlineSharp";
 export default class App extends Component {
   state = {
     groceries: [],
-    filteredGroceries: undefined,
-    searchInput: "",
     activeTab: 0,
     loading: false,
     errorLoadingData: false,
@@ -57,37 +55,15 @@ export default class App extends Component {
       });
   };
 
-  addData = () => {
+  addData = (newGrocerieName: string) => {
     firebaseDB
       .database()
       .ref()
       .child("groceries/")
       .push({
-        name: this.state.searchInput,
+        name: newGrocerieName,
         buyed: false
       });
-    this.setState({
-      searchInput: ""
-    });
-  };
-
-  enterSearchInput = (event: React.FormEvent<HTMLInputElement>) => {
-    let updatedList = [...this.state.groceries];
-    if (event.currentTarget.value.length > 0) {
-      updatedList = updatedList.filter(function(item: GroceryType) {
-        return (
-          item.name
-            .toLowerCase()
-            .search(event.currentTarget.value.toLowerCase()) !== -1
-        );
-      });
-    }
-
-    this.setState({
-      filteredGroceries:
-        event.currentTarget.value.length > 0 ? updatedList : undefined,
-      searchInput: event.currentTarget.value
-    });
   };
 
   loopThroughObject = (object: any) => {
@@ -116,7 +92,7 @@ export default class App extends Component {
 
     return (
       <div className="App">
-        Groceries: v1.7.2
+        Groceries: v1.8.0
         {this.state.errorLoadingData ? (
           <div>
             <p>error fetching data...</p>
@@ -131,20 +107,10 @@ export default class App extends Component {
             changeData={this.changeData}
           />
         )}
-        <div className="InputWrapper">
-          <input
-            type="text"
-            onChange={this.enterSearchInput}
-            value={this.state.searchInput}
-            placeholder="enter lebensmittel"
-          />
-          <button disabled={!this.state.searchInput} onClick={this.addData}>
-            Hinzufügen
-          </button>
-        </div>
         <SearchDialog
+        addNewGrocerieItem={(newGrocerieItemName: string) => this.addData(newGrocerieItemName)}
           handleListItemClicked={this.changeData}
-          groceries={this.state.filteredGroceries || this.state.groceries}
+          groceries={this.state.groceries}
           openDialog={this.state.dialogOpen}
           onCloseDialog={this.handleDialogClose}
         />
