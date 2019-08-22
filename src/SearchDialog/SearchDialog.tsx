@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItem from "@material-ui/core/ListItem";
@@ -14,12 +13,14 @@ import CloseIcon from "@material-ui/icons/Close";
 import Slide from "@material-ui/core/Slide";
 import { TransitionProps } from "@material-ui/core/transitions";
 import { GroceryType } from "../groceryType";
+import { TextField } from "@material-ui/core";
 
 type SearchDialogProps = {
   openDialog: boolean;
   onCloseDialog: () => void;
   groceries: GroceryType[];
   handleListItemClicked: (itemId: string, itemBuyed: boolean) => void;
+  addNewGrocerieItem: (newGrocerieItemName: string) => void;
 };
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -33,6 +34,19 @@ const useStyles = makeStyles((theme: Theme) =>
     title: {
       marginLeft: theme.spacing(2),
       flex: 1
+    },
+    inputWrapper: {
+      position: "fixed",
+      bottom: "15px",
+      display: "flex",
+      justifyContent: "center",
+      width: "100%"
+    },
+    textField: {
+      background: "white",
+      [`& fieldset`]: {
+        borderRadius: 100
+      }
     }
   })
 );
@@ -43,18 +57,64 @@ const Transition = React.forwardRef<unknown, TransitionProps>(
   }
 );
 
-export default function SearchDialog(props: SearchDialogProps) {
+const SearchDialog = (props: SearchDialogProps) => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
-
+  const [filteredGroceries, setFilteredGroceries] = React.useState();
+  const [searchInput, setSearchInput] = React.useState('');
+  
   useEffect(() => {
-    console.log("use effect", props);
     setOpen(props.openDialog);
   });
 
   function handleClose() {
     props.onCloseDialog();
   }
+
+  const enterSearchInput = (event: React.ChangeEvent<HTMLInputElement> ) => {
+    let updatedList = [...props.groceries];
+    if (event.currentTarget.value.length > 0) {
+      updatedList = updatedList.filter(function(item: GroceryType) {
+        return (
+          item.name
+            .toLowerCase()
+            .search(event.currentTarget.value.toLowerCase()) !== -1
+        );
+      });  
+    }
+    setSearchInput(event.currentTarget.value);
+    setFilteredGroceries(updatedList);    
+  };
+
+  const handleAddNewGrocerieItem = () => {
+    props.addNewGrocerieItem(searchInput);
+    setSearchInput('');
+    setFilteredGroceries(null);
+  }
+
+  const groceriesToDisplay = !filteredGroceries ? props.groceries : filteredGroceries;
+  const showEmptyListItem = groceriesToDisplay.length === 0;
+
+  const renderedGroceriesList = groceriesToDisplay.map((item: GroceryType) => {
+    if (item.buyed) {
+      return (
+        <div key={item.id}>
+          <ListItem
+            onClick={() =>
+              props.handleListItemClicked(item.id, item.buyed)
+            }
+            button
+          >
+            <ListItemText
+              primary={item.name}
+              secondary="Click to add"
+            />
+          </ListItem>
+          <Divider />
+        </div>
+      );
+    }
+  })
 
   return (
     <div>
@@ -80,28 +140,35 @@ export default function SearchDialog(props: SearchDialogProps) {
           </Toolbar>
         </AppBar>
         <List className={classes.listWrapper}>
-          {props.groceries.map(item => {
-            if (item.buyed) {
-              return (
-                <div>
-                  <ListItem
-                    onClick={() =>
-                      props.handleListItemClicked(item.id, item.buyed)
-                    }
-                    button
-                  >
-                    <ListItemText
-                      primary={item.name}
-                      secondary="Click to add"
-                    />
-                  </ListItem>
-                  <Divider />
-                </div>
-              );
-            }
-          })}
+          {showEmptyListItem ? 
+          <ListItem
+          onClick={ handleAddNewGrocerieItem }
+          button
+        >
+          <ListItemText
+            primary={searchInput}
+            secondary="Click to add"
+          />
+        </ListItem> : 
+        renderedGroceriesList
+        }
         </List>
+        <div className={classes.inputWrapper}>
+          <TextField
+            id="outlined-bare"
+            className={classes.textField}
+            label="Suchen"
+            onChange={enterSearchInput}
+            value={searchInput}
+            placeholder="Lebensmittel"
+            margin="normal"
+            variant="outlined"
+            inputProps={{ "aria-label": "bare" }}
+          />
+        </div>
       </Dialog>
     </div>
   );
 }
+
+export default SearchDialog;
