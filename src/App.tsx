@@ -92,7 +92,7 @@ export default class App extends Component {
 
     return (
       <div className="App">
-        Groceries: v1.8.0
+        Groceries: v1.8.1
         {this.state.errorLoadingData ? (
           <div>
             <p>error fetching data...</p>
@@ -108,7 +108,9 @@ export default class App extends Component {
           />
         )}
         <SearchDialog
-        addNewGrocerieItem={(newGrocerieItemName: string) => this.addData(newGrocerieItemName)}
+          addNewGrocerieItem={(newGrocerieItemName: string) =>
+            this.addData(newGrocerieItemName)
+          }
           handleListItemClicked={this.changeData}
           groceries={this.state.groceries}
           openDialog={this.state.dialogOpen}
