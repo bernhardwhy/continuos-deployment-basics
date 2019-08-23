@@ -1,78 +1,142 @@
-import React, { Component } from 'react'
-import './App.css';
-import { firebaseDB } from './shared/config';
-import { GroceryType } from './groceryType';
+import React, { Component } from "react";
+import "./App.css";
+import { firebaseDB } from "./shared/config";
+import { GroceryType } from "./groceryType";
+
+import { Button, Fab, Zoom } from "@material-ui/core";
+import GroceryList from "./GroceryList/GroceryList";
+import SearchDialog from "./SearchDialog/SearchDialog";
+import AddCircleOutlineSharp from "@material-ui/icons/AddCircleOutlineSharp";
 
 export default class App extends Component {
   state = {
-    groceries: {},
-    name: '',
-  }
+    groceries: [],
+    activeTab: 0,
+    loading: false,
+    errorLoadingData: false,
+    dialogOpen: false
+  };
 
   componentDidMount() {
-
-    const database = firebaseDB.database().ref().child('groceries');
-    database.on('value', snap => {
-      console.log(snap.val());
-      this.setState({ groceries: snap.val() })
-    })
+    this.fetchData();
   }
+
+  fetchData = () => {
+    this.setState({ loading: true });
+    const database = firebaseDB
+      .database()
+      .ref()
+      .child("groceries");
+    database.on(
+      "value",
+      snap => {
+        const dataToManipulate = snap.val();
+        this.loopThroughObject(dataToManipulate);
+        const manipulatedData: GroceryType[] = Object.values(dataToManipulate);
+        this.setState({ groceries: manipulatedData, loading: false });
+      },
+      () => {
+        this.setState({ loading: false, errorLoadingData: true });
+      }
+    );
+  };
 
   changeData = (groceryId: string, isBuyed: boolean) => {
-    firebaseDB.database().ref().child('groceries/' + groceryId).update({
-      buyed: !isBuyed
-    });
-  }
+    if ("vibrate" in navigator) {
+      // vibration API supported
+      navigator.vibrate([200, 500, 200]);
+    }
+    firebaseDB
+      .database()
+      .ref()
+      .child("groceries/" + groceryId)
+      .update({
+        buyed: !isBuyed
+      });
+  };
 
-  addData = () => {
-    firebaseDB.database().ref().child('groceries/').push({
-      name: this.state.name,
-      buyed: false
-    });
-  }
-
-  enterName = (event: React.FormEvent<HTMLInputElement>) => {
-    this.setState({
-      name: event.currentTarget.value
-    })
-  }
+  addData = (newGrocerieName: string) => {
+    firebaseDB
+      .database()
+      .ref()
+      .child("groceries/")
+      .push({
+        name: newGrocerieName,
+        buyed: false
+      });
+  };
 
   loopThroughObject = (object: any) => {
     for (var key in object) {
       // skip loop if the property is from prototype
       if (!object.hasOwnProperty(key)) continue;
-
       var obj = object[key];
       for (var prop in obj) {
         // skip loop if the property is from prototype
         obj.id = key;
         if (!obj.hasOwnProperty(prop)) continue;
-
       }
     }
-  }
+  };
+
+  handleDialogClose = () => {
+    this.setState({ dialogOpen: false });
+  };
+
+  handleDialogOpen = () => {
+    this.setState({ dialogOpen: true });
+  };
 
   render() {
-    const renderedGroceries: GroceryType[] = Object.values(this.state.groceries);
-    this.loopThroughObject(this.state.groceries);
+    const activeGroceryState = this.state.activeTab === 0;
+
     return (
       <div className="App">
-        <h1>Groceries: v1.1</h1>
-        {renderedGroceries.map(grocery => {
-          return (
-            <div key={ grocery.id }>
-              {!grocery.buyed &&
-                <div>
-                  <h1>{grocery.name}</h1>
-                  <button onClick={() => this.changeData(grocery.id, grocery.buyed)}>gekauft</button>
-                </div>
-              }
-            </div>
-          )
-        })}
-        <input type="text" onChange={this.enterName} value={this.state.name} placeholder="enter lebensmittel" />
-        <button disabled={!this.state.name} onClick={this.addData}>Hinzufügen</button>
+        Groceries: v1.8.1
+        {this.state.errorLoadingData ? (
+          <div>
+            <p>error fetching data...</p>
+            <Button onClick={this.fetchData} size="small">
+              retry
+            </Button>
+          </div>
+        ) : (
+          <GroceryList
+            groceries={this.state.groceries}
+            activeGroceryState={activeGroceryState}
+            changeData={this.changeData}
+          />
+        )}
+        <SearchDialog
+          addNewGrocerieItem={(newGrocerieItemName: string) =>
+            this.addData(newGrocerieItemName)
+          }
+          handleListItemClicked={this.changeData}
+          groceries={this.state.groceries}
+          openDialog={this.state.dialogOpen}
+          onCloseDialog={this.handleDialogClose}
+        />
+        <div className="BottomNavigation">
+          <Zoom
+            in={!this.state.loading}
+            style={{
+              transitionDelay: `500ms`
+            }}
+            unmountOnExit
+          >
+            <Fab
+              variant="extended"
+              size="large"
+              color="primary"
+              aria-label="add"
+              onClick={this.handleDialogOpen}
+            >
+              <AddCircleOutlineSharp />
+              Hinzufügen
+            </Fab>
+          </Zoom>
+        </div>
       </div>
-    )
+    );
   }
 }
