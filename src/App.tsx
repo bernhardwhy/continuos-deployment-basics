@@ -14,7 +14,8 @@ export default class App extends Component {
     activeTab: 0,
     loading: false,
     errorLoadingData: false,
-    dialogOpen: false
+    dialogOpen: false,
+    groceriesToBuy: []
   };
 
   componentDidMount() {
@@ -33,7 +34,14 @@ export default class App extends Component {
         const dataToManipulate = snap.val();
         this.loopThroughObject(dataToManipulate);
         const manipulatedData: GroceryType[] = Object.values(dataToManipulate);
-        this.setState({ groceries: manipulatedData, loading: false });
+        const groceriesToBuy = manipulatedData.filter(
+          data => data.buyed === false
+        );
+        this.setState({
+          groceries: manipulatedData,
+          loading: false,
+          groceriesToBuy
+        });
       },
       () => {
         this.setState({ loading: false, errorLoadingData: true });
@@ -46,6 +54,7 @@ export default class App extends Component {
       // vibration API supported
       navigator.vibrate([200, 500, 200]);
     }
+
     firebaseDB
       .database()
       .ref()
@@ -88,11 +97,9 @@ export default class App extends Component {
   };
 
   render() {
-    const activeGroceryState = this.state.activeTab === 0;
-
     return (
       <div className="App">
-        Groceries: v1.8.1
+        Groceries: v1.9.1
         {this.state.errorLoadingData ? (
           <div>
             <p>error fetching data...</p>
@@ -101,11 +108,16 @@ export default class App extends Component {
             </Button>
           </div>
         ) : (
-          <GroceryList
-            groceries={this.state.groceries}
-            activeGroceryState={activeGroceryState}
-            changeData={this.changeData}
-          />
+          <div>
+            {this.state.loading ? (
+              <p>loading data...</p>
+            ) : (
+              <GroceryList
+                groceries={this.state.groceriesToBuy}
+                changeData={this.changeData}
+              />
+            )}
+          </div>
         )}
         <SearchDialog
           addNewGrocerieItem={(newGrocerieItemName: string) =>

@@ -3,3 +3,14 @@
   height: 100%;
   padding-bottom: 64px;
 }
+
+.IconWrapper {
+  margin-top: 2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.CustomIcon {
+  font-size: 5em !important;
+}
