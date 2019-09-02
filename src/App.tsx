@@ -64,6 +64,16 @@ export default class App extends Component {
       });
   };
 
+  changeGrocerieName = (groceryId: string, groceryName: string) => {
+    firebaseDB
+      .database()
+      .ref()
+      .child("groceries/" + groceryId)
+      .update({
+        name: groceryName
+      });
+  };
+
   addData = (newGrocerieName: string) => {
     firebaseDB
       .database()
@@ -115,6 +125,7 @@ export default class App extends Component {
               <GroceryList
                 groceries={this.state.groceriesToBuy}
                 changeData={this.changeData}
+                changeGrocerieName={this.changeGrocerieName}
               />
             )}
           </div>

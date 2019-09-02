@@ -14,3 +14,9 @@
 .CustomIcon {
   font-size: 5em !important;
 }
+
+.EditButtonWrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
