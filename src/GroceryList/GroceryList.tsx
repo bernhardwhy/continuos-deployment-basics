@@ -12,8 +12,11 @@ import {
   Slide,
   Zoom,
   TextField,
-  CardHeader,
-  IconButton
+  Chip, 
+  FormControl,
+  MenuItem,
+  Select,
+  InputLabel
 } from "@material-ui/core";
 import SettingsIcon from "@material-ui/icons/Settings";
 
@@ -21,12 +24,14 @@ type GroceryProps = {
   groceries: GroceryType[];
   changeData: any;
   changeGrocerieName: (groceryId: string, groceryName: string) => void;
+  changeGrocerieArea: (groceryId: string, groceryArea: string) => void;
 };
 
 export default class GroceryList extends Component<GroceryProps> {
   state = {
     showSuccessMessage: false,
-    editMode: false
+    editMode: false,
+    area: '',
   };
 
   handleGroceryBuyedButtonClicked = (
@@ -47,15 +52,23 @@ export default class GroceryList extends Component<GroceryProps> {
     this.props.changeData(groceryId, GroceryBuyed);
   };
 
-  handleInputChanged = (groceryId: string) => (
+  handleGrocerieNameInputChanged = (groceryId: string) => (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    console.log(event.currentTarget.value, groceryId);
+    console.log(event, event.currentTarget.value, groceryId);
     this.props.changeGrocerieName(groceryId, event.currentTarget.value);
   };
 
   toggleEditMode = () => {
     this.setState({ editMode: !this.state.editMode });
+  };
+
+  
+  handleChange = (areaChanged: string, groceryId: string) =>
+    {
+      this.setState({area: areaChanged})
+      console.log(areaChanged, groceryId, this.state.area);
+      this.props.changeGrocerieArea(groceryId, areaChanged);
   };
 
   render() {
@@ -79,22 +92,35 @@ export default class GroceryList extends Component<GroceryProps> {
                   <CardContent>
                     <Typography variant="h5" component="h2">
                       {this.state.editMode ? (
-                        <TextField
+                        <div>
+                          <TextField
                           id="outlined-helperText"
                           label="Helper text"
-                          onChange={this.handleInputChanged(grocery.id)}
+                          onChange={this.handleGrocerieNameInputChanged(grocery.id)}
                           value={grocery.name}
                           margin="normal"
                           variant="outlined"
                         />
+                        <br></br>
+                        <FormControl>
+                          <InputLabel id="demo-simple-select-label">Bereich</InputLabel>
+                          <Select
+                            id="demo-simple-select"
+                            value={grocery.area}
+                            onChange={(event) => this.handleChange(event.target.value as string, grocery.id)}
+                          >
+                            <MenuItem value={"Obst & Gemüse"}>Obst & Gemüse</MenuItem>
+                            <MenuItem value={"Kühlung"}>Kühlung</MenuItem>
+                            <MenuItem value={"Brot"}>Brot</MenuItem>
+                          </Select>
+                        </FormControl>
+                        </div>
                       ) : (
                         grocery.name
                       )}
                     </Typography>
-                    {!this.state.editMode && (
-                      <Typography className="Pos" color="textSecondary">
-                        adjective
-                      </Typography>
+                    {!this.state.editMode && grocery.area && (
+                        <Chip  style={{backgroundColor: 'red'}} label={grocery.area} color="primary" />
                     )}
                   </CardContent>
                   <CardActions disableSpacing>
