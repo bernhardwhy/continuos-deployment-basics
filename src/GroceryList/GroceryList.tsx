@@ -27,6 +27,49 @@ type GroceryProps = {
   changeGrocerieArea: (groceryId: string, groceryArea: string) => void;
 };
 
+const AreaNames = { 
+  vegetables: {
+    name: "Obst & Gemüse",
+    identifier: "vegetables",
+    color: '#79B4B7'
+  },
+  cooling: {
+    name: "Milchprodukte & Eier",
+    identifier: "cooling",
+    color: '#93B5C6'
+  },
+  hygiene: {
+    name: "Hygieneabteilung",
+    identifier: "hygiene",
+    color: '#FFE3E3'
+  },
+  meat: {
+    name: "Fleisch & Fisch",
+    identifier: 'meat',
+    color: '#FFADAD'
+  },
+  bakery: {
+    name: "Brot",
+    identifier: 'bakery',
+    color: '#f3b76f'
+  },
+  cakestuff: {
+    name: "Backabteilung",
+    identifier: 'cakestuff',
+    color: '#ffb8f0'
+  },
+dryFood: {
+  name: "Trockenware",
+  identifier: 'dryFood',
+  color: "#ffe2bf"
+},
+  other: {
+    name: "Sonstiges",
+    identifier: 'other',
+    color: "#d0d0d084"
+  }
+}
+
 export default class GroceryList extends Component<GroceryProps> {
   state = {
     showSuccessMessage: false,
@@ -71,6 +114,20 @@ export default class GroceryList extends Component<GroceryProps> {
       this.props.changeGrocerieArea(groceryId, areaChanged);
   };
 
+  getAreaLabelName = (savedAreaIdentifier: string) => {
+    type ObjectKey = keyof typeof AreaNames;
+    const AreaNamesObjectKey = savedAreaIdentifier as ObjectKey;
+    let AreaNameIdentified = AreaNames[AreaNamesObjectKey] ? AreaNames[AreaNamesObjectKey].name : 'red';
+    return AreaNameIdentified;
+  }
+
+  getAreaLabelColor = (savedAreaIdentifier: string) => {
+    type ObjectKey = keyof typeof AreaNames;
+    const AreaColorObjectKey = savedAreaIdentifier as ObjectKey;
+    let AreaColorIdentified = AreaNames[AreaColorObjectKey] ? AreaNames[AreaColorObjectKey].color : 'red';
+    return AreaColorIdentified;
+  }
+
   render() {
     const groceryList =
       this.props.groceries.length > 0 ? (
@@ -109,18 +166,26 @@ export default class GroceryList extends Component<GroceryProps> {
                             value={grocery.area}
                             onChange={(event) => this.handleChange(event.target.value as string, grocery.id)}
                           >
-                            <MenuItem value={"Obst & Gemüse"}>Obst & Gemüse</MenuItem>
-                            <MenuItem value={"Kühlung"}>Kühlung</MenuItem>
-                            <MenuItem value={"Brot"}>Brot</MenuItem>
+                            <MenuItem value={AreaNames.vegetables.identifier}>{AreaNames.vegetables.name}</MenuItem>
+                            <MenuItem value={AreaNames.cooling.identifier}>{AreaNames.cooling.name}</MenuItem>
+                            <MenuItem value={AreaNames.bakery.identifier}>{AreaNames.bakery.name}</MenuItem>
+                            <MenuItem value={AreaNames.cakestuff.identifier}>{AreaNames.cakestuff.name}</MenuItem>
+                            <MenuItem value={AreaNames.dryFood.identifier}>{AreaNames.dryFood.name}</MenuItem>
+                            <MenuItem value={AreaNames.hygiene.identifier}>{AreaNames.hygiene.name}</MenuItem>
+                            <MenuItem value={AreaNames.meat.identifier}>{AreaNames.meat.name}</MenuItem>
+                            <MenuItem value={AreaNames.other.identifier}>{AreaNames.other.name}</MenuItem>
                           </Select>
                         </FormControl>
                         </div>
                       ) : (
-                        grocery.name
+                        grocery.name  
                       )}
                     </Typography>
                     {!this.state.editMode && grocery.area && (
-                        <Chip  style={{backgroundColor: 'red'}} label={grocery.area} color="primary" />
+                        <Chip
+                        style={{backgroundColor: this.getAreaLabelColor(grocery.area)}}
+                        label={this.getAreaLabelName(grocery.area)}
+                        />
                     )}
                   </CardContent>
                   <CardActions disableSpacing>
