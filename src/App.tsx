@@ -36,7 +36,7 @@ export default class App extends Component {
         const manipulatedData: GroceryType[] = Object.values(dataToManipulate);
         const groceriesToBuy = manipulatedData.filter(
           data => data.buyed === false
-        );
+          );
         this.setState({
           groceries: manipulatedData,
           loading: false,
@@ -71,6 +71,16 @@ export default class App extends Component {
       .child("groceries/" + groceryId)
       .update({
         name: groceryName
+      });
+  };
+
+  changeGrocerieArea = (groceryId: string, groceryArea: string) => {
+    firebaseDB
+      .database()
+      .ref()
+      .child("groceries/" + groceryId)
+      .update({
+        area: groceryArea
       });
   };
 
@@ -109,7 +119,7 @@ export default class App extends Component {
   render() {
     return (
       <div className="App">
-        Groceries: v1.9.1
+        Groceries: v1.2.0
         {this.state.errorLoadingData ? (
           <div>
             <p>error fetching data...</p>
@@ -126,6 +136,7 @@ export default class App extends Component {
                 groceries={this.state.groceriesToBuy}
                 changeData={this.changeData}
                 changeGrocerieName={this.changeGrocerieName}
+                changeGrocerieArea={this.changeGrocerieArea}
               />
             )}
           </div>
