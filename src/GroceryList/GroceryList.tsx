@@ -117,7 +117,7 @@ export default class GroceryList extends Component<GroceryProps> {
   getAreaLabelName = (savedAreaIdentifier: string) => {
     type ObjectKey = keyof typeof AreaNames;
     const AreaNamesObjectKey = savedAreaIdentifier as ObjectKey;
-    let AreaNameIdentified = AreaNames[AreaNamesObjectKey] ? AreaNames[AreaNamesObjectKey].name : 'red';
+    let AreaNameIdentified = AreaNames[AreaNamesObjectKey] ? AreaNames[AreaNamesObjectKey].name : 'undefined';
     return AreaNameIdentified;
   }
 
