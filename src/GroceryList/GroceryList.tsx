@@ -28,45 +28,45 @@ type GroceryProps = {
 };
 
 const AreaNames = { 
-  vegetables: {
+  Avegetables: {
     name: "Obst & Gemüse",
-    identifier: "vegetables",
-    color: '#79B4B7'
+    identifier: "Avegetables",
+    color: '#79B4B7',
   },
-  cooling: {
+  Bcooling: {
     name: "Milchprodukte & Eier",
-    identifier: "cooling",
-    color: '#93B5C6'
+    identifier: "Bcooling",
+    color: '#93B5C6',
   },
-  hygiene: {
+  Fhygiene: {
     name: "Hygieneabteilung",
-    identifier: "hygiene",
-    color: '#FFE3E3'
+    identifier: "Fhygiene",
+    color: '#FFE3E3',
   },
-  meat: {
+  Cmeat: {
     name: "Fleisch & Fisch",
-    identifier: 'meat',
-    color: '#FFADAD'
+    identifier: 'Cmeat',
+    color: '#FFADAD',
   },
-  bakery: {
+  Ebakery: {
     name: "Brot",
-    identifier: 'bakery',
-    color: '#f3b76f'
+    identifier: 'Ebakery',
+    color: '#f3b76f',
   },
-  cakestuff: {
+  Gcakestuff: {
     name: "Backabteilung",
-    identifier: 'cakestuff',
-    color: '#ffb8f0'
+    identifier: 'Gcakestuff',
+    color: '#ffb8f0',
   },
-dryFood: {
+  DdryFood: {
   name: "Trockenware",
-  identifier: 'dryFood',
-  color: "#ffe2bf"
+  identifier: 'DdryFood',
+  color: "#ffe2bf",
 },
-  other: {
+Hother: {
     name: "Sonstiges",
-    identifier: 'other',
-    color: "#d0d0d084"
+    identifier: 'Hother',
+    color: "#d0d0d084",
   }
 }
 
@@ -129,6 +129,76 @@ export default class GroceryList extends Component<GroceryProps> {
   }
 
   render() {
+    const orderedGroceries = this.props.groceries
+    .sort((a, b) => a.area > b.area ? 1 : -1)
+    .map((grocery) => 
+      <div className="GroceryItem" key={grocery.id}>
+        <Card className="Card">
+          <CardContent>
+            <Typography variant="h5" component="h2">
+              {this.state.editMode ? (
+                <div>
+                  <TextField
+                  id="outlined-helperText"
+                  label="Helper text"
+                  onChange={this.handleGrocerieNameInputChanged(grocery.id)}
+                  value={grocery.name}
+                  margin="normal"
+                  variant="outlined"
+                />
+                <br></br>
+                <FormControl>
+                  <InputLabel id="demo-simple-select-label">Bereich</InputLabel>
+                  <Select
+                    id="demo-simple-select"
+                    value={grocery.area}
+                    onChange={(event) => this.handleChange(event.target.value as string, grocery.id)}
+                  >
+                    <MenuItem value={AreaNames.Avegetables.identifier}>{AreaNames.Avegetables.name}</MenuItem>
+                    <MenuItem value={AreaNames.Bcooling.identifier}>{AreaNames.Bcooling.name}</MenuItem>
+                    <MenuItem value={AreaNames.Ebakery.identifier}>{AreaNames.Ebakery.name}</MenuItem>
+                    <MenuItem value={AreaNames.Gcakestuff.identifier}>{AreaNames.Gcakestuff.name}</MenuItem>
+                    <MenuItem value={AreaNames.DdryFood.identifier}>{AreaNames.DdryFood.name}</MenuItem>
+                    <MenuItem value={AreaNames.Fhygiene.identifier}>{AreaNames.Fhygiene.name}</MenuItem>
+                    <MenuItem value={AreaNames.Cmeat.identifier}>{AreaNames.Cmeat.name}</MenuItem>
+                    <MenuItem value={AreaNames.Hother.identifier}>{AreaNames.Hother.name}</MenuItem>
+                  </Select>
+                </FormControl>
+                </div>
+              ) : (
+                grocery.name  
+              )}
+            </Typography>
+            {!this.state.editMode && grocery.area && (
+                <Chip
+                style={{backgroundColor: this.getAreaLabelColor(grocery.area)}}
+                label={this.getAreaLabelName(grocery.area)}
+                />
+            )}
+          </CardContent>
+          <CardActions disableSpacing>
+            {this.state.editMode ? (
+              <Button onClick={this.toggleEditMode} size="small">
+                speichern
+              </Button>
+            ) : (
+              <Button
+                onClick={() =>
+                  this.handleGroceryBuyedButtonClicked(
+                    grocery.id,
+                    grocery.buyed
+                  )
+                }
+                size="small"
+              >
+                gekauft
+              </Button>
+            )}
+          </CardActions>
+        </Card>
+      </div>
+    );
+
     const groceryList =
       this.props.groceries.length > 0 ? (
         <div>
@@ -142,75 +212,7 @@ export default class GroceryList extends Component<GroceryProps> {
               Edit
             </Button>
           </div>
-          {this.props.groceries.map(grocery => {
-            return (
-              <div className="GroceryItem" key={grocery.id}>
-                <Card className="Card">
-                  <CardContent>
-                    <Typography variant="h5" component="h2">
-                      {this.state.editMode ? (
-                        <div>
-                          <TextField
-                          id="outlined-helperText"
-                          label="Helper text"
-                          onChange={this.handleGrocerieNameInputChanged(grocery.id)}
-                          value={grocery.name}
-                          margin="normal"
-                          variant="outlined"
-                        />
-                        <br></br>
-                        <FormControl>
-                          <InputLabel id="demo-simple-select-label">Bereich</InputLabel>
-                          <Select
-                            id="demo-simple-select"
-                            value={grocery.area}
-                            onChange={(event) => this.handleChange(event.target.value as string, grocery.id)}
-                          >
-                            <MenuItem value={AreaNames.vegetables.identifier}>{AreaNames.vegetables.name}</MenuItem>
-                            <MenuItem value={AreaNames.cooling.identifier}>{AreaNames.cooling.name}</MenuItem>
-                            <MenuItem value={AreaNames.bakery.identifier}>{AreaNames.bakery.name}</MenuItem>
-                            <MenuItem value={AreaNames.cakestuff.identifier}>{AreaNames.cakestuff.name}</MenuItem>
-                            <MenuItem value={AreaNames.dryFood.identifier}>{AreaNames.dryFood.name}</MenuItem>
-                            <MenuItem value={AreaNames.hygiene.identifier}>{AreaNames.hygiene.name}</MenuItem>
-                            <MenuItem value={AreaNames.meat.identifier}>{AreaNames.meat.name}</MenuItem>
-                            <MenuItem value={AreaNames.other.identifier}>{AreaNames.other.name}</MenuItem>
-                          </Select>
-                        </FormControl>
-                        </div>
-                      ) : (
-                        grocery.name  
-                      )}
-                    </Typography>
-                    {!this.state.editMode && grocery.area && (
-                        <Chip
-                        style={{backgroundColor: this.getAreaLabelColor(grocery.area)}}
-                        label={this.getAreaLabelName(grocery.area)}
-                        />
-                    )}
-                  </CardContent>
-                  <CardActions disableSpacing>
-                    {this.state.editMode ? (
-                      <Button onClick={this.toggleEditMode} size="small">
-                        speichern
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={() =>
-                          this.handleGroceryBuyedButtonClicked(
-                            grocery.id,
-                            grocery.buyed
-                          )
-                        }
-                        size="small"
-                      >
-                        gekauft
-                      </Button>
-                    )}
-                  </CardActions>
-                </Card>
-              </div>
-            );
-          })}
+          {orderedGroceries}
         </div>
       ) : (
         <Zoom
